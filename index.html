@@ -1,0 +1,929 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Wgn Store</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800&display=swap">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --accent: #a855f7; --accent-2: #7c3aed; --accent-rgb: 168, 85, 247;
+  --bg: #120a1c; --bg-2: #1a0f28; --card: #1d1030; --card-2: #241539;
+  --text: #f5f0ff; --muted: #b9a8d6; --border: rgba(var(--accent-rgb), .45); --radius: 14px;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0; font-family: "Cairo", system-ui, sans-serif; color: var(--text); min-height: 100vh;
+  background-color: var(--bg); background-size: cover; background-position: center; background-attachment: fixed;
+}
+a { color: inherit; text-decoration: none; }
+button, input, select, textarea { font-family: inherit; }
+img { display: block; }
+[hidden] { display: none !important; }
+.container { width: min(1180px, 100% - 32px); margin-inline: auto; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px; padding: 8px 18px;
+  border-radius: 999px; border: 1px solid transparent; font-weight: 700; font-size: 14px; cursor: pointer;
+  white-space: nowrap; color: #fff; background: transparent; transition: transform .15s, background .2s;
+}
+.btn:hover { transform: translateY(-1px); }
+.btn:disabled { opacity: .6; cursor: wait; transform: none; }
+.btn-outline { border-color: var(--accent); color: var(--accent); }
+.btn-outline:hover { background: rgba(var(--accent-rgb), .12); }
+.btn-accent { background: var(--accent-2); }
+.btn-accent:hover { background: var(--accent); }
+.btn.wide { flex: 1; width: 100%; border-radius: 10px; padding: 11px; }
+.btn-soft { background: rgba(var(--accent-rgb), .15); color: var(--accent); border-radius: 8px; }
+.btn-soft:hover { background: rgba(var(--accent-rgb), .25); }
+.btn-danger-outline { border-color: #ef4444; color: #f87171; }
+.btn-danger-outline:hover { background: rgba(239, 68, 68, .12); }
+
+/* Header */
+.topbar {
+  background: rgba(30, 16, 46, .92); backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(var(--accent-rgb), .35); position: sticky; top: 0; z-index: 20;
+}
+.topbar-row { display: flex; align-items: center; gap: 18px; padding: 14px 0; flex-wrap: wrap; }
+.brand { display: flex; align-items: center; gap: 10px; font-size: 22px; font-weight: 800; direction: ltr; }
+.brand i { color: var(--accent); font-size: 28px; }
+.brand em { font-style: normal; color: var(--accent); }
+.search {
+  flex: 1; min-width: 200px; max-width: 360px; display: flex; align-items: center; gap: 10px;
+  background: rgba(255, 255, 255, .04); border: 1px solid rgba(var(--accent-rgb), .35); border-radius: 999px; padding: 0 14px;
+}
+.search i { color: var(--muted); }
+.search input { flex: 1; background: none; border: 0; outline: 0; color: var(--text); padding: 9px 0; font-size: 14px; min-width: 0; }
+.search:focus-within { border-color: var(--accent); }
+.topbar-actions { display: flex; align-items: center; gap: 16px; margin-inline-start: auto; }
+.theme-dots { display: flex; gap: 8px; }
+.theme-dot { width: 17px; height: 17px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .25); cursor: pointer; padding: 0; }
+.theme-dot:hover { transform: scale(1.15); }
+.theme-dot.active { border-color: #fff; box-shadow: 0 0 10px currentColor; }
+
+/* Store */
+.section-head { display: flex; align-items: center; justify-content: space-between; margin: 30px 0 16px; gap: 12px; }
+.section-head h1 { font-size: 22px; margin: 0; display: flex; align-items: center; gap: 10px; }
+.section-head h1 i { color: var(--accent); }
+.live { color: var(--accent); font-size: 13px; display: flex; align-items: center; gap: 6px; }
+.live i { animation: spin 3s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; padding-bottom: 50px; }
+.card {
+  background: var(--card); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px;
+  display: flex; flex-direction: column; cursor: pointer; transition: transform .2s, box-shadow .2s, border-color .2s;
+}
+.card:hover { transform: translateY(-3px); border-color: var(--accent); box-shadow: 0 10px 30px rgba(var(--accent-rgb), .18); }
+.card-top { display: flex; gap: 14px; align-items: flex-start; margin-bottom: 16px; }
+.thumb {
+  width: 70px; height: 70px; border-radius: 12px; object-fit: cover; flex-shrink: 0;
+  background: var(--card-2); display: grid; place-items: center; color: var(--accent); font-size: 26px;
+}
+.card-info { flex: 1; min-width: 0; }
+.card-title { font-size: 16px; font-weight: 800; margin: 0 0 2px; line-height: 1.45; overflow-wrap: anywhere; }
+.card-version { color: var(--muted); font-size: 13px; }
+.meta { display: flex; gap: 14px; font-size: 13px; color: var(--muted); margin-top: 4px; }
+.meta span { display: inline-flex; align-items: center; gap: 5px; }
+.star { color: #fbbf24; }
+.card-foot { display: flex; align-items: center; justify-content: space-between; border-top: 1px solid rgba(var(--accent-rgb), .3); margin-top: auto; padding-top: 12px; }
+.btn-dl { background: rgba(59, 130, 246, .18); color: #93c5fd; border-radius: 6px; padding: 6px 12px; font-size: 13px; }
+.btn-dl:hover { background: rgba(59, 130, 246, .3); }
+.badge { font-size: 12px; font-weight: 700; padding: 3px 9px; border-radius: 5px; }
+.cat-minecraft { background: #064e3b; color: #6ee7b7; }
+.cat-roblox { background: #7f1d1d; color: #fca5a5; }
+.cat-mods { background: #1e3a8a; color: #93c5fd; }
+.cat-scripts { background: #134e4a; color: #5eead4; }
+.cat-other-games { background: #5b21b6; color: #ddd6fe; }
+.cat-videos { background: #7c2d12; color: #fdba74; }
+.empty { text-align: center; color: var(--muted); padding: 60px 0; }
+.empty i { font-size: 42px; color: var(--accent); margin-bottom: 12px; display: block; }
+.skeleton { height: 160px; border-radius: var(--radius); background: linear-gradient(90deg, var(--card), var(--card-2), var(--card)); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
+@keyframes shimmer { to { background-position: -200% 0; } }
+
+/* Modal */
+.modal { position: fixed; inset: 0; background: rgba(5, 2, 10, .7); backdrop-filter: blur(4px); display: grid; place-items: center; z-index: 50; padding: 16px; }
+.modal-box { position: relative; width: min(600px, 100%); max-height: 90vh; overflow: auto; background: var(--bg-2); border: 1px solid var(--border); border-radius: 18px; padding: 22px; }
+.modal-close { position: absolute; top: 12px; left: 14px; background: none; border: 0; color: var(--text); font-size: 22px; cursor: pointer; }
+.modal-head { display: flex; gap: 16px; align-items: flex-start; }
+.modal-head .thumb { width: 90px; height: 90px; border-radius: 16px; font-size: 34px; }
+.modal-head h2 { margin: 0 0 4px; font-size: 22px; line-height: 1.4; padding-left: 28px; overflow-wrap: anywhere; }
+.modal-dev { color: var(--muted); font-size: 14px; }
+.modal-meta { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 6px; font-size: 14px; font-weight: 700; }
+.safe { color: #f472b6; font-weight: 600; }
+.modal h3 { margin: 22px 0 6px; font-size: 18px; }
+.modal-desc { color: var(--muted); white-space: pre-wrap; line-height: 1.8; margin: 0; overflow-wrap: anywhere; }
+.btn-big { width: 100%; margin-top: 22px; padding: 14px; border-radius: 12px; font-size: 16px; background: linear-gradient(90deg, var(--accent-2), var(--accent)); }
+
+/* Login */
+.login { min-height: 100vh; display: grid; place-items: center; padding: 16px; }
+.login-box { width: min(400px, 100%); text-align: center; background: var(--card); border: 1px solid var(--border); border-radius: 20px; padding: 32px 26px; }
+.login-icon { width: 70px; height: 70px; margin: 0 auto 12px; border-radius: 50%; display: grid; place-items: center; font-size: 28px; background: linear-gradient(135deg, var(--accent), var(--accent-2)); }
+.login-box h1 { margin: 0; font-size: 22px; }
+.login-box p { color: var(--muted); margin: 4px 0 18px; }
+.login-err { color: #f87171; font-size: 14px; min-height: 22px; margin-top: 10px; }
+.back-link { color: var(--muted); font-size: 14px; display: inline-flex; gap: 6px; align-items: center; margin-top: 6px; }
+.back-link:hover { color: var(--accent); }
+.shake { animation: shake .35s; }
+@keyframes shake { 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
+
+/* Inputs */
+.input {
+  width: 100%; background: rgba(8, 4, 14, .55); color: var(--text); border: 1px solid rgba(var(--accent-rgb), .35);
+  border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: 0; margin-bottom: 12px;
+}
+.input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(var(--accent-rgb), .15); }
+.input::placeholder { color: #7d6d99; }
+textarea.input { resize: vertical; line-height: 1.7; }
+input[type=file].input { padding: 7px; cursor: pointer; }
+input[type=file]::file-selector-button { background: var(--card-2); color: var(--text); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; margin-inline-end: 10px; cursor: pointer; font-family: inherit; }
+.pass-wrap { position: relative; }
+.pass-wrap .input { padding-left: 42px; }
+.eye { position: absolute; left: 10px; top: 10px; background: none; border: 0; color: var(--muted); cursor: pointer; font-size: 15px; }
+.eye:hover { color: var(--accent); }
+.lbl { display: block; font-size: 14px; color: var(--muted); margin-bottom: 6px; }
+.lbl.accent { color: var(--accent); }
+.hint { display: block; color: var(--muted); font-size: 12px; margin-top: 8px; line-height: 1.6; }
+.row { display: flex; gap: 10px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+/* Dashboard */
+.dash-top { border-bottom: 1px solid rgba(var(--accent-rgb), .3); background: rgba(26, 14, 40, .9); }
+.dash-top-row { display: flex; align-items: center; gap: 14px; padding: 14px 0; flex-wrap: wrap; }
+.dash-title { margin: 0; font-size: 22px; display: flex; align-items: center; gap: 10px; }
+.dash-title i, .dash-title b { color: var(--accent); }
+.dash-actions { display: flex; gap: 10px; margin-inline-start: auto; }
+.mode-badge { font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; }
+.mode-badge.gh { background: rgba(16, 185, 129, .15); color: #34d399; }
+.mode-badge.local { background: rgba(251, 191, 36, .15); color: #fbbf24; }
+.dash-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; padding: 26px 0 60px; align-items: start; }
+.panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 22px; }
+.panel h2 { font-size: 19px; margin: 0 0 12px; display: flex; align-items: center; gap: 10px; }
+.panel h2 i { color: var(--accent); }
+.panel hr { border: 0; border-top: 1px solid rgba(var(--accent-rgb), .3); margin: 22px 0; }
+.theme-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.theme-btn { border: 2px solid transparent; border-radius: 10px; padding: 10px 6px; font-weight: 700; color: #fff; cursor: pointer; font-size: 14px; }
+.theme-btn.active { border-color: #fff; }
+.theme-btn[data-theme=neon] { color: #04252b; }
+.token-box { background: rgba(8, 4, 14, .4); border-radius: 12px; padding: 14px; margin-bottom: 16px; }
+.token-box .row .btn { padding: 6px 14px; font-size: 13px; }
+.img-pick { display: flex; gap: 12px; align-items: flex-start; }
+.img-preview { width: 84px; height: 84px; flex-shrink: 0; border-radius: 12px; background: var(--card-2); border: 1px dashed var(--border); display: grid; place-items: center; color: var(--muted); font-size: 24px; overflow: hidden; }
+.img-preview img { width: 100%; height: 100%; object-fit: cover; }
+.img-inputs { flex: 1; min-width: 0; }
+.list-head { display: flex; align-items: center; justify-content: space-between; }
+.list-head h2 { margin: 0; }
+.count { background: rgba(var(--accent-rgb), .18); color: var(--accent); font-weight: 800; border-radius: 999px; padding: 2px 12px; }
+.list-search { max-width: none; margin: 14px 0; }
+.item-list { display: flex; flex-direction: column; gap: 10px; }
+.item-row { display: flex; align-items: center; gap: 12px; background: rgba(8, 4, 14, .4); border-radius: 10px; padding: 10px 12px; border: 1px solid transparent; }
+.item-row.editing { border-color: var(--accent); }
+.item-row .thumb { width: 46px; height: 46px; border-radius: 8px; font-size: 18px; }
+.item-row-info { flex: 1; min-width: 0; }
+.item-row-info strong { display: block; font-size: 15px; overflow-wrap: anywhere; }
+.item-row-info span { color: var(--muted); font-size: 13px; }
+.item-row-actions { display: flex; gap: 8px; }
+.btn-edit, .btn-del { padding: 5px 12px; font-size: 13px; border-radius: 6px; }
+.btn-edit { background: #eab308; color: #1c1300; }
+.btn-del { background: #ef4444; }
+.list-empty { text-align: center; color: var(--muted); padding: 30px 0; }
+
+/* Toasts */
+#toasts { position: fixed; bottom: 20px; left: 20px; z-index: 100; display: flex; flex-direction: column; gap: 8px; }
+.toast { padding: 10px 16px; border-radius: 10px; font-weight: 700; font-size: 14px; color: #fff; transition: opacity .4s; }
+.toast-ok { background: #059669; }
+.toast-err { background: #dc2626; }
+.toast-info { background: var(--accent-2); }
+.toast.hide { opacity: 0; }
+
+@media (max-width: 980px) {
+  .grid { grid-template-columns: repeat(2, 1fr); }
+  .dash-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .grid { grid-template-columns: 1fr; }
+  .topbar { position: static; }
+  .search { max-width: none; order: 3; flex-basis: 100%; }
+  .section-head { flex-direction: column; align-items: flex-start; }
+  .theme-grid { grid-template-columns: repeat(2, 1fr); }
+  .two { grid-template-columns: 1fr; gap: 0; }
+  .dash-actions { width: 100%; margin: 0; }
+  .dash-actions .btn { flex: 1; }
+  .item-row { flex-wrap: wrap; }
+  .item-row-actions { width: 100%; justify-content: flex-end; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===================== المتجر ===================== -->
+<div id="storeView">
+  <header class="topbar">
+    <div class="container topbar-row">
+      <a class="brand" href="#"><i class="fa-solid fa-store"></i><span><b class="storeName">Wgn</b> <em>Store</em></span></a>
+      <label class="search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="searchInput" type="search" placeholder="ابحث عن التطبيقات، الألعاب، المودات، السكربتات...">
+      </label>
+      <div class="topbar-actions">
+        <div class="theme-dots" id="themeDots" title="اختر لون الموقع"></div>
+        <a href="#dashboard" class="btn btn-outline"><i class="fa-solid fa-gauge-high"></i> الداشبورد</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="section-head">
+      <h1><i class="fa-solid fa-fire"></i> أحدث الإصدارات والمحتوى</h1>
+      <span class="live"><i class="fa-solid fa-rotate"></i> تحديث تلقائي فعال</span>
+    </div>
+    <div class="grid" id="grid"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></div>
+    <div class="empty" id="empty" hidden><i class="fa-solid fa-box-open"></i><span id="emptyText"></span></div>
+  </main>
+
+  <div class="modal" id="modal" hidden>
+    <div class="modal-box" role="dialog" aria-modal="true">
+      <button class="modal-close" id="modalClose" aria-label="إغلاق"><i class="fa-solid fa-xmark"></i></button>
+      <div id="modalBody"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== دخول الداشبورد ===================== -->
+<section id="loginView" class="login" hidden>
+  <form class="login-box" id="loginForm" autocomplete="off">
+    <div class="login-icon"><i class="fa-solid fa-lock"></i></div>
+    <h1>الداشبورد محمي</h1>
+    <p>أدخل المفتاح السري للدخول</p>
+    <div class="pass-wrap">
+      <input type="password" id="keyInput" class="input" placeholder="المفتاح السري" required>
+      <button type="button" class="eye" data-toggle="keyInput" aria-label="إظهار"><i class="fa-solid fa-eye"></i></button>
+    </div>
+    <button class="btn btn-accent wide" id="loginBtn"><i class="fa-solid fa-right-to-bracket"></i> دخول</button>
+    <div class="login-err" id="loginErr"></div>
+    <a href="#" class="back-link"><i class="fa-solid fa-arrow-right"></i> العودة للمتجر</a>
+  </form>
+</section>
+
+<!-- ===================== الداشبورد ===================== -->
+<div id="dashView" hidden>
+  <header class="dash-top">
+    <div class="container dash-top-row">
+      <h1 class="dash-title"><i class="fa-solid fa-palette"></i> داشبورد | <b class="storeName">Wgn</b></h1>
+      <span class="mode-badge" id="modeBadge"></span>
+      <div class="dash-actions">
+        <a href="#" class="btn btn-outline"><i class="fa-solid fa-store"></i> العودة للمتجر</a>
+        <button class="btn btn-danger-outline" id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i> خروج</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="container dash-grid">
+    <section class="panel">
+      <h2><i class="fa-solid fa-image"></i> تعيين خلفية عامة للموقع (يشوفها الكل)</h2>
+      <label class="lbl">اختر صورة خلفية من جهازك:</label>
+      <input type="file" id="bgFile" accept="image/*" class="input">
+      <div class="row">
+        <button class="btn btn-accent wide" id="bgSave"><i class="fa-solid fa-paint-roller"></i> حفظ وتطبيق الخلفية لكل الزوار</button>
+        <button class="btn btn-danger-outline" id="bgRemove" title="إزالة الخلفية"><i class="fa-solid fa-trash"></i></button>
+      </div>
+
+      <hr>
+      <h2><i class="fa-solid fa-palette"></i> اختيار ثيم المتجر</h2>
+      <div class="theme-grid" id="themeGrid"></div>
+
+      <hr>
+      <h2 id="formTitle"><i class="fa-solid fa-circle-plus"></i> إضافة / تعديل لعبة أو مود</h2>
+      <div class="token-box">
+        <label class="lbl accent"><i class="fa-solid fa-key"></i> مفتاح GitHub Token:</label>
+        <div class="pass-wrap">
+          <input type="password" id="tokenInput" class="input" placeholder="ضع مفتاح Token هنا" autocomplete="off">
+          <button type="button" class="eye" data-toggle="tokenInput" aria-label="إظهار"><i class="fa-solid fa-eye"></i></button>
+        </div>
+        <div class="row">
+          <button class="btn btn-soft" id="tokenSave">حفظ المفتاح</button>
+          <button class="btn btn-soft" id="tokenClear">مسح</button>
+        </div>
+        <small class="hint" id="tokenHint"></small>
+      </div>
+
+      <form id="itemForm" autocomplete="off">
+        <label class="lbl" for="fTitle">عنوان المنشور:</label>
+        <input class="input" id="fTitle" placeholder="مثال: Roblox Auto Farm Script" required maxlength="140">
+        <label class="lbl" for="fCategory">القسم:</label>
+        <select class="input" id="fCategory"></select>
+        <div class="two">
+          <div><label class="lbl" for="fVersion">رقم الإصدار:</label><input class="input" id="fVersion" placeholder="v1.0"></div>
+          <div><label class="lbl" for="fDeveloper">اسم المطور:</label><input class="input" id="fDeveloper" placeholder="Wgn"></div>
+        </div>
+        <label class="lbl" for="fLink">رابط التحميل المباشر / السكربت:</label>
+        <input class="input" id="fLink" type="url" placeholder="https://download-link.com" dir="ltr" required>
+        <label class="lbl">صورة الغلاف (من جهازك أو رابط):</label>
+        <div class="img-pick">
+          <div class="img-preview" id="imgPreview"><i class="fa-solid fa-image"></i></div>
+          <div class="img-inputs">
+            <input type="file" id="fImageFile" accept="image/*" class="input">
+            <input class="input" id="fImageUrl" type="url" placeholder="أو ألصق رابط الصورة https://..." dir="ltr">
+          </div>
+        </div>
+        <label class="lbl" for="fDesc">الشرح والتفاصيل:</label>
+        <textarea class="input" id="fDesc" rows="4" placeholder="اكتب شرح المحتوى..."></textarea>
+        <div class="two">
+          <div><label class="lbl" for="fRating">التقييم:</label><input class="input" id="fRating" type="number" min="0" max="5" step="0.1" value="4.9"></div>
+          <div><label class="lbl" for="fDownloads">عدد التنزيلات:</label><input class="input" id="fDownloads" type="number" min="0" step="1" value="1000"></div>
+        </div>
+        <div class="row">
+          <button class="btn btn-accent wide" id="itemSave"><i class="fa-solid fa-cloud-arrow-up"></i> <span>نشر المحتوى</span></button>
+          <button type="button" class="btn btn-soft" id="itemCancel" hidden>إلغاء التعديل</button>
+        </div>
+      </form>
+
+      <hr>
+      <h2><i class="fa-solid fa-user-shield"></i> تغيير المفتاح السري</h2>
+      <div class="pass-wrap">
+        <input type="password" id="newKey" class="input" placeholder="المفتاح الجديد (8 أحرف على الأقل)" autocomplete="new-password">
+        <button type="button" class="eye" data-toggle="newKey" aria-label="إظهار"><i class="fa-solid fa-eye"></i></button>
+      </div>
+      <input type="password" id="newKey2" class="input" placeholder="تأكيد المفتاح الجديد" autocomplete="new-password">
+      <button class="btn btn-accent wide" id="keySave"><i class="fa-solid fa-lock"></i> تغيير المفتاح</button>
+    </section>
+
+    <section class="panel">
+      <div class="list-head">
+        <h2><i class="fa-solid fa-list-check"></i> إدارة المحتوى (تعديل وحذف)</h2>
+        <span class="count" id="itemCount">0</span>
+      </div>
+      <label class="search list-search">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <input id="listSearch" type="search" placeholder="ابحث في المحتوى...">
+      </label>
+      <div id="itemList" class="item-list"></div>
+    </section>
+  </main>
+</div>
+
+<script>
+// =====================================================
+//  الإعدادات - عدّلها هنا
+// =====================================================
+const CFG = {
+  storeName: "Wgn",
+  // مستودع GitHub اللي فيه هذا الملف (اتركها فاضية للتجربة المحلية)
+  github: { owner: "", repo: "", branch: "main", dataPath: "data.json" },
+  // بصمة SHA-256 للمفتاح السري الافتراضي: Wgn-2026  (غيّره من الداشبورد)
+  dashboardKeyHash: "facc7f9a15e35a8638b7c012462da9ba4c15658387ee241d65590066e043e703",
+  refreshSeconds: 60
+};
+
+// =====================================================
+//  أدوات مشتركة
+// =====================================================
+const CATEGORIES = {
+  minecraft:     { label: "ماين كرافت", icon: "fa-cubes" },
+  roblox:        { label: "روبلكس",     icon: "fa-robot" },
+  mods:          { label: "مودات",      icon: "fa-puzzle-piece" },
+  scripts:       { label: "سكربتات",    icon: "fa-code" },
+  "other-games": { label: "ألعاب أخرى", icon: "fa-gamepad" },
+  videos:        { label: "فيديوهات",   icon: "fa-circle-play" }
+};
+const THEMES = {
+  neon:    { label: "النيون الأزرق", accent: "#22d3ee", accent2: "#0891b2", rgb: "34, 211, 238" },
+  cyber:   { label: "السايبر بنك",   accent: "#ec4899", accent2: "#db2777", rgb: "236, 72, 153" },
+  emerald: { label: "الزمردي",       accent: "#10b981", accent2: "#059669", rgb: "16, 185, 129" },
+  purple:  { label: "الأرجواني",     accent: "#a855f7", accent2: "#7c3aed", rgb: "168, 85, 247" }
+};
+const LOCAL_DATA_KEY = "wgn_local_data";
+const THEME_PREF_KEY = "wgn_theme";
+const TOKEN_KEY = "wgn_gh_token";
+const SESSION_KEY = "wgn_dash_session";
+const FAIL_KEY = "wgn_login_fails";
+
+const $ = id => document.getElementById(id);
+const state = { data: emptyData(), loaded: false, query: "", editingId: null, listQuery: "", busy: false, authed: false };
+
+function store(area, key, value) {
+  try {
+    if (value === undefined) return area.getItem(key);
+    if (value === null) area.removeItem(key); else area.setItem(key, value);
+  } catch (e) { if (value !== undefined) throw e; }
+  return null;
+}
+function emptyData() { return { settings: { theme: "purple", background: "", keyHash: "" }, items: [] }; }
+function normalizeData(d) {
+  const base = emptyData();
+  if (!d || typeof d !== "object") return base;
+  return { settings: Object.assign(base.settings, d.settings || {}), items: Array.isArray(d.items) ? d.items : [] };
+}
+const isRepoConfigured = () => !!(CFG.github.owner && CFG.github.repo);
+const rawUrl = path => `https://raw.githubusercontent.com/${CFG.github.owner}/${CFG.github.repo}/${CFG.github.branch}/${path}`;
+const getToken = () => store(localStorage, TOKEN_KEY) || "";
+const ghMode = () => isRepoConfigured() && !!getToken();
+
+async function fetchJson(url) {
+  const res = await fetch(url + (url.includes("?") ? "&" : "?") + "t=" + Date.now(), { cache: "no-store" });
+  if (!res.ok) throw new Error("HTTP " + res.status);
+  return res.json();
+}
+async function loadPublicData() {
+  if (isRepoConfigured()) {
+    try { return normalizeData(await fetchJson(rawUrl(CFG.github.dataPath))); } catch (e) {}
+  } else {
+    const local = store(localStorage, LOCAL_DATA_KEY);
+    if (local) { try { return normalizeData(JSON.parse(local)); } catch (e) {} }
+  }
+  try { return normalizeData(await fetchJson(CFG.github.dataPath)); } catch (e) { return emptyData(); }
+}
+function escapeHtml(s) {
+  return String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function safeUrl(url) { const u = String(url || "").trim(); return /^(https?:|data:image\/)/i.test(u) ? u : ""; }
+async function sha256(text) {
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(text));
+  return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, "0")).join("");
+}
+function formatDownloads(n) {
+  n = Number(n) || 0;
+  if (n >= 1e6) return +(n / 1e6).toFixed(1) + " M";
+  if (n >= 1000) return +(n / 1000).toFixed(1) + " k";
+  return String(n);
+}
+function applyTheme(name) {
+  const t = THEMES[name] || THEMES.purple, r = document.documentElement.style;
+  r.setProperty("--accent", t.accent); r.setProperty("--accent-2", t.accent2); r.setProperty("--accent-rgb", t.rgb);
+}
+function applyBackground(url) {
+  const u = safeUrl(url);
+  document.body.style.backgroundImage = u
+    ? `linear-gradient(rgba(14, 8, 22, .82), rgba(14, 8, 22, .92)), url("${u.replace(/"/g, "%22")}")` : "";
+}
+function thumbHtml(item) {
+  const img = safeUrl(item.image);
+  return img ? `<img class="thumb" src="${escapeHtml(img)}" alt="" loading="lazy">`
+    : `<div class="thumb"><i class="fa-solid ${(CATEGORIES[item.category] || {}).icon || "fa-box"}"></i></div>`;
+}
+function toast(msg, type = "ok") {
+  let box = $("toasts");
+  if (!box) { box = document.createElement("div"); box.id = "toasts"; document.body.appendChild(box); }
+  const el = document.createElement("div");
+  el.className = "toast toast-" + type; el.textContent = msg; box.appendChild(el);
+  setTimeout(() => el.classList.add("hide"), 3200);
+  setTimeout(() => el.remove(), 3700);
+}
+const sortedItems = () => state.data.items.slice().sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+// =====================================================
+//  المتجر
+// =====================================================
+function renderThemeDots() {
+  const current = store(localStorage, THEME_PREF_KEY) || state.data.settings.theme;
+  $("themeDots").innerHTML = Object.entries(THEMES).map(([k, t]) =>
+    `<button class="theme-dot ${k === current ? "active" : ""}" data-theme="${k}" title="${t.label}" style="background:${t.accent};color:${t.accent}"></button>`).join("");
+  $("themeDots").querySelectorAll(".theme-dot").forEach(dot => {
+    dot.onclick = () => { store(localStorage, THEME_PREF_KEY, dot.dataset.theme); applyTheme(dot.dataset.theme); renderThemeDots(); };
+  });
+}
+
+function renderGrid() {
+  if (!state.loaded) return;
+  const q = state.query.trim().toLowerCase();
+  const items = sortedItems().filter(i => !q || [i.title, i.description, i.developer, i.version, (CATEGORIES[i.category] || {}).label]
+    .some(v => String(v || "").toLowerCase().includes(q)));
+  $("empty").hidden = items.length > 0;
+  $("emptyText").textContent = q ? "ما لقينا نتائج لبحثك." : "لا يوجد محتوى حالياً.";
+  $("grid").innerHTML = items.map(item => `
+    <article class="card" data-id="${escapeHtml(item.id)}">
+      <div class="card-top">
+        ${thumbHtml(item)}
+        <div class="card-info">
+          <h2 class="card-title">${escapeHtml(item.title)}</h2>
+          <div class="card-version">${escapeHtml(item.version || "")}</div>
+          <div class="meta">
+            <span><i class="fa-solid fa-star star"></i> ${escapeHtml(item.rating ?? "4.9")}</span>
+            <span><i class="fa-solid fa-download"></i> ${formatDownloads(item.downloads)}</span>
+          </div>
+        </div>
+      </div>
+      <div class="card-foot">
+        <button class="btn btn-dl" data-dl><i class="fa-solid fa-download"></i> تنزيل</button>
+        <span class="badge cat-${escapeHtml(item.category)}">${escapeHtml((CATEGORIES[item.category] || {}).label || "")}</span>
+      </div>
+    </article>`).join("");
+  $("grid").querySelectorAll(".card").forEach(card => {
+    card.onclick = e => e.target.closest("[data-dl]") ? openLink(card.dataset.id) : openModal(card.dataset.id);
+  });
+}
+
+const findItem = id => state.data.items.find(i => i.id === id);
+function openLink(id) {
+  const url = safeUrl((findItem(id) || {}).link);
+  if (url) window.open(url, "_blank", "noopener"); else toast("رابط التحميل غير متوفر", "err");
+}
+function openModal(id) {
+  const item = findItem(id);
+  if (!item) return;
+  $("modalBody").innerHTML = `
+    <div class="modal-head">
+      ${thumbHtml(item)}
+      <div>
+        <h2>${escapeHtml(item.title)}</h2>
+        <div class="modal-dev">المطور: ${escapeHtml(item.developer || CFG.storeName)}</div>
+        <div class="modal-meta">
+          <span><i class="fa-solid fa-star star"></i> ${escapeHtml(item.rating ?? "4.9")}</span>
+          <span><i class="fa-solid fa-download"></i> ${formatDownloads(item.downloads)} تنزيل</span>
+          <span class="safe"><i class="fa-solid fa-shield-halved"></i> آمن وموثوق</span>
+        </div>
+      </div>
+    </div>
+    <h3>الشرح والتفاصيل</h3>
+    <p class="modal-desc">${escapeHtml(item.description || "لا يوجد وصف متاح.")}</p>
+    <button class="btn btn-big" id="modalDl"><i class="fa-solid fa-cloud-arrow-down"></i> تنزيل / فتح الرابط</button>`;
+  $("modalDl").onclick = () => openLink(id);
+  $("modal").hidden = false;
+}
+const closeModal = () => { $("modal").hidden = true; };
+
+function applyStoreSettings() {
+  applyTheme(store(localStorage, THEME_PREF_KEY) || state.data.settings.theme);
+  applyBackground(state.data.settings.background);
+  renderThemeDots();
+}
+
+async function refreshStore() {
+  if (location.hash === "#dashboard") return;
+  const data = await loadPublicData();
+  const changed = !state.loaded || JSON.stringify(data) !== JSON.stringify(state.data);
+  state.data = data;
+  state.loaded = true;
+  if (changed) { applyStoreSettings(); renderGrid(); }
+}
+
+// =====================================================
+//  GitHub API
+// =====================================================
+function utf8ToB64(str) {
+  const bytes = new TextEncoder().encode(str);
+  let bin = "";
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+  return btoa(bin);
+}
+function b64ToUtf8(b64) {
+  const bin = atob(b64.replace(/\s/g, ""));
+  return new TextDecoder().decode(Uint8Array.from(bin, c => c.charCodeAt(0)));
+}
+async function gh(path, options = {}) {
+  const g = CFG.github;
+  const url = `https://api.github.com/repos/${g.owner}/${g.repo}/contents/${path.split("/").map(encodeURIComponent).join("/")}`
+    + (options.method ? "" : `?ref=${encodeURIComponent(g.branch)}&t=${Date.now()}`);
+  const res = await fetch(url, {
+    method: options.method || "GET", cache: "no-store",
+    headers: { Authorization: `Bearer ${getToken()}`, Accept: "application/vnd.github+json", ...(options.body ? { "Content-Type": "application/json" } : {}) },
+    body: options.body ? JSON.stringify(options.body) : undefined
+  });
+  if (res.status === 404 && !options.method) return null;
+  if (!res.ok) {
+    throw new Error(res.status === 401 ? "مفتاح GitHub Token غير صالح"
+      : res.status === 403 ? "التوكن ما عنده صلاحية كتابة على المستودع"
+      : res.status === 409 ? "تعارض في الحفظ، حاول مرة ثانية"
+      : res.status === 404 ? "المستودع غير موجود أو التوكن ما يقدر يوصله"
+      : "خطأ من GitHub (" + res.status + ")");
+  }
+  return res.json();
+}
+async function ghReadData() {
+  const file = await gh(CFG.github.dataPath);
+  if (!file) return { data: emptyData(), sha: null };
+  return { data: normalizeData(JSON.parse(b64ToUtf8(file.content))), sha: file.sha };
+}
+const ghWrite = (path, base64, message, sha) =>
+  gh(path, { method: "PUT", body: { message, content: base64, branch: CFG.github.branch, ...(sha ? { sha } : {}) } });
+
+// =====================================================
+//  الداشبورد
+// =====================================================
+async function loadAdminData() {
+  if (ghMode()) return (await ghReadData()).data;
+  return loadPublicData();
+}
+
+async function mutate(fn, message) {
+  if (ghMode()) {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const { data, sha } = await ghReadData();
+      fn(data);
+      try {
+        await ghWrite(CFG.github.dataPath, utf8ToB64(JSON.stringify(data, null, 2)), message, sha);
+        state.data = data;
+        break;
+      } catch (e) { if (attempt === 1 || !/تعارض/.test(e.message)) throw e; }
+    }
+  } else {
+    const data = normalizeData(JSON.parse(JSON.stringify(state.data)));
+    fn(data);
+    try { store(localStorage, LOCAL_DATA_KEY, JSON.stringify(data)); }
+    catch (e) { throw new Error("مساحة المتصفح ممتلئة، استخدم صور أصغر أو اربط GitHub"); }
+    state.data = data;
+  }
+  renderDash();
+}
+
+function compressImage(file, maxSize, quality) {
+  return new Promise((resolve, reject) => {
+    if (!file.type.startsWith("image/")) return reject(new Error("الملف المختار ليس صورة"));
+    const img = new Image(), url = URL.createObjectURL(file);
+    img.onload = () => {
+      const scale = Math.min(1, maxSize / Math.max(img.width, img.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(img.width * scale); c.height = Math.round(img.height * scale);
+      c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+      URL.revokeObjectURL(url);
+      resolve(c.toDataURL("image/webp", quality));
+    };
+    img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("تعذر قراءة الصورة")); };
+    img.src = url;
+  });
+}
+async function uploadImage(file, maxSize, quality) {
+  const dataUrl = await compressImage(file, maxSize, quality);
+  if (!ghMode()) return dataUrl;
+  const path = `uploads/${Date.now()}-${Math.random().toString(36).slice(2, 8)}.webp`;
+  await ghWrite(path, dataUrl.split(",")[1], "upload image " + path);
+  return rawUrl(path);
+}
+
+async function withBusy(btn, task) {
+  if (state.busy) return;
+  state.busy = true;
+  const html = btn.innerHTML;
+  btn.disabled = true;
+  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...`;
+  try { await task(); }
+  catch (e) { toast(e.message || "صار خطأ", "err"); }
+  finally { state.busy = false; btn.disabled = false; btn.innerHTML = html; }
+}
+
+const expectedHash = () => state.data.settings.keyHash || CFG.dashboardKeyHash;
+
+async function tryLogin(e) {
+  e.preventDefault();
+  const fails = JSON.parse(store(localStorage, FAIL_KEY) || '{"n":0,"until":0}');
+  const wait = Math.ceil((fails.until - Date.now()) / 1000);
+  if (wait > 0) { $("loginErr").textContent = `محاولات كثيرة، انتظر ${wait} ثانية`; return; }
+  $("loginBtn").disabled = true;
+  try {
+    state.data = await loadAdminData().catch(() => loadPublicData());
+    const hash = await sha256($("keyInput").value);
+    if (hash === expectedHash()) {
+      store(localStorage, FAIL_KEY, null);
+      store(sessionStorage, SESSION_KEY, hash);
+      state.authed = true;
+      $("keyInput").value = "";
+      route();
+    } else {
+      fails.n++;
+      if (fails.n >= 5) fails.until = Date.now() + Math.min(300, 30 * (fails.n - 4)) * 1000;
+      store(localStorage, FAIL_KEY, JSON.stringify(fails));
+      $("loginErr").textContent = "المفتاح السري غير صحيح";
+      $("loginForm").classList.remove("shake"); void $("loginForm").offsetWidth; $("loginForm").classList.add("shake");
+      $("keyInput").select();
+    }
+  } catch (err) {
+    $("loginErr").textContent = "تعذر التحقق: " + err.message;
+  } finally {
+    $("loginBtn").disabled = false;
+  }
+}
+
+function renderDash() {
+  applyTheme(state.data.settings.theme);
+  applyBackground(state.data.settings.background);
+
+  const badge = $("modeBadge");
+  if (ghMode()) {
+    badge.className = "mode-badge gh";
+    badge.innerHTML = `<i class="fa-brands fa-github"></i> متصل بـ GitHub: ${escapeHtml(CFG.github.owner + "/" + CFG.github.repo)}`;
+  } else {
+    badge.className = "mode-badge local";
+    badge.innerHTML = `<i class="fa-solid fa-flask"></i> وضع تجربة محلي (يحفظ في هذا المتصفح فقط)`;
+  }
+  $("tokenInput").value = getToken();
+  $("tokenHint").textContent = isRepoConfigured()
+    ? "التوكن ينحفظ في هذا المتصفح فقط ولا يُنشر في الموقع."
+    : "عشان يشوف الكل التعديلات: عبّي owner و repo داخل ملف index.html (قسم الإعدادات) ثم ضع التوكن هنا.";
+
+  const current = state.data.settings.theme;
+  $("themeGrid").innerHTML = Object.entries(THEMES).map(([k, t]) =>
+    `<button class="theme-btn ${k === current ? "active" : ""}" data-theme="${k}" style="background:${t.accent}">${t.label}</button>`).join("");
+  $("themeGrid").querySelectorAll(".theme-btn").forEach(btn => {
+    btn.onclick = () => withBusy(btn, async () => {
+      await mutate(d => { d.settings.theme = btn.dataset.theme; }, "change theme");
+      toast("تم تغيير ثيم المتجر لكل الزوار");
+    });
+  });
+  renderList();
+}
+
+function renderList() {
+  const q = state.listQuery.trim().toLowerCase();
+  const items = sortedItems().filter(i => !q || String(i.title).toLowerCase().includes(q));
+  $("itemCount").textContent = state.data.items.length;
+  $("itemList").innerHTML = items.length ? items.map(item => `
+    <div class="item-row ${item.id === state.editingId ? "editing" : ""}">
+      ${thumbHtml(item)}
+      <div class="item-row-info">
+        <strong>${escapeHtml(item.title)}</strong>
+        <span>${escapeHtml((CATEGORIES[item.category] || {}).label || item.category)} | ${escapeHtml(item.version || "-")}</span>
+      </div>
+      <div class="item-row-actions">
+        <button class="btn btn-edit" data-edit="${escapeHtml(item.id)}"><i class="fa-solid fa-pen-to-square"></i> تعديل</button>
+        <button class="btn btn-del" data-del="${escapeHtml(item.id)}"><i class="fa-solid fa-trash"></i> حذف</button>
+      </div>
+    </div>`).join("")
+    : `<div class="list-empty">${q ? "لا توجد نتائج" : "لا يوجد محتوى بعد، أضف أول منشور!"}</div>`;
+  $("itemList").querySelectorAll("[data-edit]").forEach(b => { b.onclick = () => startEdit(b.dataset.edit); });
+  $("itemList").querySelectorAll("[data-del]").forEach(b => { b.onclick = () => deleteItem(b.dataset.del, b); });
+}
+
+function setPreview(src) {
+  const url = safeUrl(src);
+  $("imgPreview").innerHTML = url ? `<img src="${escapeHtml(url)}" alt="">` : `<i class="fa-solid fa-image"></i>`;
+}
+function resetForm() {
+  state.editingId = null;
+  $("itemForm").reset();
+  $("itemSave").querySelector("span").textContent = "نشر المحتوى";
+  $("itemCancel").hidden = true;
+  setPreview("");
+  renderList();
+}
+function startEdit(id) {
+  const item = findItem(id);
+  if (!item) return;
+  state.editingId = id;
+  $("fTitle").value = item.title || "";
+  $("fCategory").value = item.category;
+  $("fVersion").value = item.version || "";
+  $("fDeveloper").value = item.developer || "";
+  $("fLink").value = item.link || "";
+  $("fImageUrl").value = item.image && !item.image.startsWith("data:") ? item.image : "";
+  $("fImageFile").value = "";
+  $("fDesc").value = item.description || "";
+  $("fRating").value = item.rating ?? 4.9;
+  $("fDownloads").value = item.downloads ?? 0;
+  $("itemSave").querySelector("span").textContent = "حفظ التعديلات";
+  $("itemCancel").hidden = false;
+  setPreview(item.image);
+  renderList();
+  $("formTitle").scrollIntoView({ behavior: "smooth", block: "start" });
+}
+function saveItem(e) {
+  e.preventDefault();
+  withBusy($("itemSave"), async () => {
+    const editingId = state.editingId;
+    const existing = findItem(editingId);
+    let image = $("fImageUrl").value.trim() || (existing && String(existing.image || "").startsWith("data:") ? existing.image : "");
+    const file = $("fImageFile").files[0];
+    if (file) image = await uploadImage(file, 400, 0.88);
+    const fields = {
+      title: $("fTitle").value.trim(),
+      category: $("fCategory").value,
+      version: $("fVersion").value.trim(),
+      developer: $("fDeveloper").value.trim() || CFG.storeName,
+      link: $("fLink").value.trim(),
+      image,
+      description: $("fDesc").value.trim(),
+      rating: Math.min(5, Math.max(0, parseFloat($("fRating").value) || 0)),
+      downloads: Math.max(0, parseInt($("fDownloads").value, 10) || 0)
+    };
+    await mutate(d => {
+      const idx = d.items.findIndex(i => i.id === editingId);
+      if (editingId && idx !== -1) d.items[idx] = { ...d.items[idx], ...fields, updatedAt: Date.now() };
+      else d.items.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...fields, createdAt: Date.now() });
+    }, (editingId ? "edit: " : "add: ") + fields.title);
+    toast(editingId ? "تم حفظ التعديلات" : "تم نشر المحتوى بنجاح");
+    resetForm();
+  });
+}
+function deleteItem(id, btn) {
+  const item = findItem(id);
+  if (!item || !confirm(`متأكد تبي تحذف "${item.title}"؟`)) return;
+  withBusy(btn, async () => {
+    await mutate(d => { d.items = d.items.filter(i => i.id !== id); }, "delete: " + item.title);
+    if (state.editingId === id) resetForm();
+    toast("تم الحذف");
+  });
+}
+
+function bindDashboard() {
+  $("fCategory").innerHTML = Object.entries(CATEGORIES).map(([k, c]) => `<option value="${k}">${c.label}</option>`).join("");
+  $("loginForm").addEventListener("submit", tryLogin);
+  $("logoutBtn").onclick = () => { store(sessionStorage, SESSION_KEY, null); state.authed = false; location.hash = ""; };
+  $("itemForm").addEventListener("submit", saveItem);
+  $("itemCancel").onclick = resetForm;
+  $("listSearch").addEventListener("input", e => { state.listQuery = e.target.value; renderList(); });
+  $("fImageUrl").addEventListener("input", e => setPreview(e.target.value));
+  $("fImageFile").addEventListener("change", e => {
+    const f = e.target.files[0];
+    if (f) $("imgPreview").innerHTML = `<img src="${URL.createObjectURL(f)}" alt="">`;
+  });
+
+  $("bgSave").onclick = () => withBusy($("bgSave"), async () => {
+    const file = $("bgFile").files[0];
+    if (!file) throw new Error("اختر صورة أولاً");
+    const url = await uploadImage(file, 1920, 0.8);
+    await mutate(d => { d.settings.background = url; }, "set background");
+    $("bgFile").value = "";
+    toast("تم تعيين الخلفية لكل الزوار");
+  });
+  $("bgRemove").onclick = () => {
+    if (!state.data.settings.background) return toast("ما فيه خلفية مضافة", "info");
+    if (!confirm("تبي تشيل الخلفية؟")) return;
+    withBusy($("bgRemove"), async () => {
+      await mutate(d => { d.settings.background = ""; }, "remove background");
+      toast("تمت إزالة الخلفية");
+    });
+  };
+
+  $("tokenSave").onclick = async () => {
+    const token = $("tokenInput").value.trim();
+    if (!token) return toast("ضع التوكن أولاً", "err");
+    if (!isRepoConfigured()) return toast("عبّي owner و repo داخل index.html أولاً", "err");
+    store(localStorage, TOKEN_KEY, token);
+    try { state.data = await loadAdminData(); renderDash(); toast("تم حفظ التوكن والاتصال بـ GitHub"); }
+    catch (e) { toast(e.message, "err"); }
+  };
+  $("tokenClear").onclick = async () => {
+    store(localStorage, TOKEN_KEY, null);
+    state.data = await loadPublicData();
+    renderDash();
+    toast("تم مسح التوكن من هذا المتصفح", "info");
+  };
+
+  $("keySave").onclick = () => withBusy($("keySave"), async () => {
+    const k1 = $("newKey").value;
+    if (k1.length < 8) throw new Error("المفتاح لازم يكون 8 أحرف على الأقل");
+    if (k1 !== $("newKey2").value) throw new Error("المفتاحين غير متطابقين");
+    const hash = await sha256(k1);
+    await mutate(d => { d.settings.keyHash = hash; }, "change dashboard key");
+    store(sessionStorage, SESSION_KEY, hash);
+    $("newKey").value = $("newKey2").value = "";
+    toast("تم تغيير المفتاح السري");
+  });
+}
+
+// =====================================================
+//  التنقل بين المتجر والداشبورد
+// =====================================================
+async function route() {
+  const wantsDash = location.hash === "#dashboard";
+  closeModal();
+  if (!wantsDash) {
+    $("loginView").hidden = $("dashView").hidden = true;
+    $("storeView").hidden = false;
+    state.loaded = false;
+    refreshStore();
+    return;
+  }
+  $("storeView").hidden = true;
+  if (!state.authed) {
+    const session = store(sessionStorage, SESSION_KEY);
+    if (session) {
+      state.data = await loadAdminData().catch(() => loadPublicData());
+      state.authed = session === expectedHash();
+      if (!state.authed) store(sessionStorage, SESSION_KEY, null);
+    }
+  }
+  $("loginView").hidden = state.authed;
+  $("dashView").hidden = !state.authed;
+  if (state.authed) {
+    if (ghMode()) state.data = await loadAdminData().catch(() => state.data);
+    renderDash();
+  } else {
+    applyBackground("");
+    $("loginErr").textContent = "";
+    $("keyInput").focus();
+  }
+}
+
+document.querySelectorAll(".storeName").forEach(el => { el.textContent = CFG.storeName; });
+document.querySelectorAll("[data-toggle]").forEach(btn => {
+  btn.onclick = () => {
+    const input = $(btn.dataset.toggle);
+    input.type = input.type === "password" ? "text" : "password";
+    btn.innerHTML = `<i class="fa-solid ${input.type === "password" ? "fa-eye" : "fa-eye-slash"}"></i>`;
+  };
+});
+$("searchInput").addEventListener("input", e => { state.query = e.target.value; renderGrid(); });
+$("modalClose").onclick = closeModal;
+$("modal").addEventListener("click", e => { if (e.target.id === "modal") closeModal(); });
+document.addEventListener("keydown", e => { if (e.key === "Escape") closeModal(); });
+window.addEventListener("hashchange", route);
+
+applyTheme(store(localStorage, THEME_PREF_KEY) || "purple");
+bindDashboard();
+route();
+setInterval(refreshStore, Math.max(15, CFG.refreshSeconds) * 1000);
+</script>
+</body>
+</html>
