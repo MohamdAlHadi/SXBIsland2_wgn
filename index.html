@@ -371,7 +371,7 @@ input[type=file]::file-selector-button { background: var(--card-2); color: var(-
 const CFG = {
   storeName: "Wgn",
   // مستودع GitHub اللي فيه هذا الملف (اتركها فاضية للتجربة المحلية)
-  github: { owner: "MohamdAlHadi", repo: "SXBIsland2_wgn", branch: "main", dataPath: "data.json" },
+  github: { owner: "", repo: "", branch: "main", dataPath: "data.json" },
   // بصمة SHA-256 للمفتاح السري الافتراضي: Wgn-2026  (غيّره من الداشبورد)
   dashboardKeyHash: "facc7f9a15e35a8638b7c012462da9ba4c15658387ee241d65590066e043e703",
   refreshSeconds: 60
@@ -777,9 +777,10 @@ function startEdit(id) {
   renderList();
   $("formTitle").scrollIntoView({ behavior: "smooth", block: "start" });
 }
-function saveItem(e) {
+async function saveItem(e) {
   e.preventDefault();
-  withBusy($("itemSave"), async () => {
+  let saved = false;
+  await withBusy($("itemSave"), async () => {
     const editingId = state.editingId;
     const existing = findItem(editingId);
     let image = $("fImageUrl").value.trim() || (existing && String(existing.image || "").startsWith("data:") ? existing.image : "");
@@ -802,8 +803,9 @@ function saveItem(e) {
       else d.items.push({ id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), ...fields, createdAt: Date.now() });
     }, (editingId ? "edit: " : "add: ") + fields.title);
     toast(editingId ? "تم حفظ التعديلات" : "تم نشر المحتوى بنجاح");
-    resetForm();
+    saved = true;
   });
+  if (saved) resetForm();
 }
 function deleteItem(id, btn) {
   const item = findItem(id);
