@@ -335,7 +335,7 @@ input[type=file]::file-selector-button { background: var(--card-2); color: var(-
           <div><label class="lbl" for="fDownloads">عدد التنزيلات:</label><input class="input" id="fDownloads" type="number" min="0" step="1" value="1000"></div>
         </div>
         <div class="row">
-          <button class="btn btn-accent wide" id="itemSave"><i class="fa-solid fa-cloud-arrow-up"></i> <span>نشر المحتوى</span></button>
+          <button class="btn btn-accent wide" id="itemSave"><i class="fa-solid fa-cloud-arrow-up"></i> <span id="itemSaveLabel">نشر المحتوى</span></button>
           <button type="button" class="btn btn-soft" id="itemCancel" hidden>إلغاء التعديل</button>
         </div>
       </form>
@@ -655,12 +655,13 @@ async function uploadImage(file, maxSize, quality) {
 async function withBusy(btn, task) {
   if (state.busy) return;
   state.busy = true;
-  const html = btn.innerHTML;
+  const icon = btn.querySelector("i");
+  const iconClass = icon ? icon.className : "";
   btn.disabled = true;
-  btn.innerHTML = `<i class="fa-solid fa-spinner fa-spin"></i> جاري الحفظ...`;
+  if (icon) icon.className = "fa-solid fa-spinner fa-spin";
   try { await task(); }
   catch (e) { toast(e.message || "صار خطأ", "err"); }
-  finally { state.busy = false; btn.disabled = false; btn.innerHTML = html; }
+  finally { state.busy = false; btn.disabled = false; if (icon) icon.className = iconClass; }
 }
 
 const expectedHash = () => state.data.settings.keyHash || CFG.dashboardKeyHash;
@@ -752,7 +753,7 @@ function setPreview(src) {
 function resetForm() {
   state.editingId = null;
   $("itemForm").reset();
-  $("itemSave").querySelector("span").textContent = "نشر المحتوى";
+  $("itemSaveLabel").textContent = "نشر المحتوى";
   $("itemCancel").hidden = true;
   setPreview("");
   renderList();
@@ -771,7 +772,7 @@ function startEdit(id) {
   $("fDesc").value = item.description || "";
   $("fRating").value = item.rating ?? 4.9;
   $("fDownloads").value = item.downloads ?? 0;
-  $("itemSave").querySelector("span").textContent = "حفظ التعديلات";
+  $("itemSaveLabel").textContent = "حفظ التعديلات";
   $("itemCancel").hidden = false;
   setPreview(item.image);
   renderList();
